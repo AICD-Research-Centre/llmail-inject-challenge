@@ -9,11 +9,11 @@ import os
 from .prompt_utils import LLM_JUDGE_PROMPT_PHASE1, LLM_JUDGE_PROMPT_PHASE2, format_emails
 from torch.nn.functional import softmax
 
-COMPETITON_PHASE = os.getenv("COMPETITON_PHASE")
+COMPETITION_PHASE = os.getenv("COMPETITION_PHASE")
 
-if COMPETITON_PHASE == "phase1":
+if COMPETITION_PHASE == "phase1":
     LLM_JUDGE_PROMPT = LLM_JUDGE_PROMPT_PHASE1
-elif COMPETITON_PHASE == "phase2":
+elif COMPETITION_PHASE == "phase2":
     LLM_JUDGE_PROMPT = LLM_JUDGE_PROMPT_PHASE2
 
 

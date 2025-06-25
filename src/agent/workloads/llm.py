@@ -23,7 +23,7 @@ from .prompt_utils import (
 )
 from .task_tracker_utils import check_task_tracker_in_defs
 
-COMPETITON_PHASE = os.getenv("COMPETITON_PHASE")
+COMPETITION_PHASE = os.getenv("COMPETITION_PHASE")
 
 
 def set_seed(seed):
@@ -85,8 +85,7 @@ class LLMWithDefenses:
 
         self.cb = cb
 
-        self.llms = {}
-        self.llms["task_tracker_LLM"] = task_tracker_llm
+        self.llms = {"task_tracker_LLM": task_tracker_llm}
 
         if "prompt_shield" in defenses:
             assert prompt_shield_model is not None
@@ -148,7 +147,7 @@ class LLMWithDefenses:
             formatted_emails = SPOTLIGHT_DATA_MARK.join(formatted_emails.split(" "))
             formatted_emails = SPOTLIGHT_EMAILS_FORMAT.format(formatted_emails)
 
-        elif COMPETITON_PHASE == "phase2":
+        elif COMPETITION_PHASE == "phase2":
             # Apply tags for phase 2 for all defenses since we don't have specific spotlighting defense
             # Don't apply the datamarking
             system_prompt += SPOTLIGHT_SYS_SUFFIX
@@ -240,7 +239,7 @@ class GPTLLM(LLM):
         )
         if not response.choices:
             logging.error("No response from the LLM.")
-            raise Error("No response received from the LLM")
+            raise Exception("No response received from the LLM")
 
         message = response.choices[0].message
 
@@ -288,7 +287,7 @@ class Phi3LLM(LLM):
 
         if not response.choices:
             logging.error("No response from the LLM.")
-            raise Error("No response received from the LLM")
+            raise Exception("No response received from the LLM")
 
         tool_calls = parse_tool_calls(response.choices[0].message.content)
 

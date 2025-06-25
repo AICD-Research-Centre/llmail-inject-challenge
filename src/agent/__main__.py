@@ -83,7 +83,7 @@ if __name__ == "__main__":
     > python ./src/agent azure --enable-task-tracker
     """
     args, unknown_args = parse_args()
-    os.environ["COMPETITON_PHASE"] = args.phase
+    os.environ["COMPETITION_PHASE"] = args.phase
 
     # Run the agent
     asyncio.run(main(args.source, args.enable_task_tracker, args.no_op_workload, unknown_args))

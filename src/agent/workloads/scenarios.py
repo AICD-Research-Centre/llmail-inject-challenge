@@ -18,14 +18,14 @@ from .task_tracker_utils import check_task_tracker_in_defs, remove_task_tracker_
 from .conformal.blocklist import ConformalBlocklist
 from .conformal.utils import format_email
 
-COMPETITON_PHASE = os.getenv("COMPETITON_PHASE")
+COMPETITION_PHASE = os.getenv("COMPETITION_PHASE")
 
 
 class LLMRouter:
     """Abstracts multiple LLMs and defenses, and routes the query to the correct LLM model-defense."""
 
     def __init__(self, system_prompt, llms: list[str], defenses: list[str], config: dict):
-        if COMPETITON_PHASE == "phase2" and config["apply_cb"]:
+        if COMPETITION_PHASE == "phase2" and config["apply_cb"]:
             assert config["conformal_paradb"] != ""
             self.cb = ConformalBlocklist(
                 alpha=0, alpha_global=0.1, blocklist_db_file=config["conformal_paradb"]
@@ -69,10 +69,10 @@ class LLMRouter:
         for llm_name in llms:
             for defense in defenses:
                 if defense == "all":
-                    if COMPETITON_PHASE == "phase1":
+                    if COMPETITION_PHASE == "phase1":
                         defense_list = ["task_tracker", "prompt_shield", "llm_judge", "spotlight"]
                         task_tracker_models["all"] = task_tracker_models["task_tracker"]
-                    elif COMPETITON_PHASE == "phase2":
+                    elif COMPETITION_PHASE == "phase2":
                         defense_list = ["task_tracker_phi4", "prompt_shield", "llm_judge"]
                         task_tracker_models["all"] = task_tracker_models["task_tracker_phi4"]
                 else:
@@ -123,7 +123,7 @@ class ScenarioWorkload(Workload):
         defense: str,
         retriever: EmailRetriever,
         query: str,
-        groundtruth: list[str],
+        groundtruth: dict[str, str | dict[str, str]],
     ):
         self.name = name
         self.llm = llm
@@ -140,7 +140,7 @@ class ScenarioWorkload(Workload):
 
         emails, rank = self.retriever.retrieve(attacker_email)
         # Now rank is the index and it is None if the email is not retrieved
-        is_attacker_email_retrieved = False if rank == None else True
+        is_attacker_email_retrieved = False if rank is None else True
 
         # Run the LLM model for this challenge and score the results.
         logger.info(f"Executing scenario workload for job: {job.job_id}")
@@ -205,9 +205,9 @@ class GeneralWorkload(Workload):
         self.scenarios = {}
         config = load_config()
 
-        if COMPETITON_PHASE == "phase1":
+        if COMPETITION_PHASE == "phase1":
             config["scenarios"] = config["phase1_scenarios"]
-        elif COMPETITON_PHASE == "phase2":
+        elif COMPETITION_PHASE == "phase2":
             config["scenarios"] = config["phase2_scenarios"]
 
         for task_tracker_model in config["task_tracker_models"]:
@@ -248,12 +248,13 @@ class GeneralWorkload(Workload):
                 defenses.remove("all")
 
         # In order to load LLMs that are specifically needed
-        if COMPETITON_PHASE == "phase1":
-            defenses.remove("task_tracker_phi3_medium")
-            defenses.remove("task_tracker_phi3.5_moe")
-            defenses.remove("task_tracker_phi4")
-        elif COMPETITON_PHASE == "phase2":
-            defenses.remove("task_tracker")
+        if check_task_tracker_in_defs(defenses):
+            if COMPETITION_PHASE == "phase1":
+                defenses.remove("task_tracker_phi3_medium")
+                defenses.remove("task_tracker_phi3.5_moe")
+                defenses.remove("task_tracker_phi4")
+            elif COMPETITION_PHASE == "phase2":
+                defenses.remove("task_tracker")
 
         llm_router = LLMRouter(config["llm_system_prompt"], config["llms"], defenses, config=config)
 

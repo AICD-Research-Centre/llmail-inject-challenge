@@ -1,7 +1,7 @@
 # This file contains the configuration for the various CTF scenarios.
 # Create a new scenario by adding a new entry under the `scenarios` key.
 
-# Constants and general configuations 
+# Constants and general configurations
 task_tracker_models:
   #task_tracker is the same as task_tracker_phi3_medium but just for keeping the name of the defense the same for the different phases of the competition 
   task_tracker: 
@@ -38,7 +38,7 @@ llms:
   - microsoft/Phi-3-medium-128k-instruct
 defense:
   # NOTE: TaskTracker must be enabled explicitly when running the agent.
-  # NOTE: All will be different accoding to the phase
+  # NOTE: All will be different according to the phase
   # NOTE: task_tracker is the same as task_tracker_phi3_medium but keeping the name for both phases.
   - task_tracker
   - task_tracker_phi3_medium

@@ -63,7 +63,7 @@ jobs:
           include-hidden-files: true
           path: src/api/
 
-  ####### Useful for deloyment, but currently commented out
+  ####### Useful for deployment, but currently commented out
   # deploy:
   #   name: Deploy
   #   runs-on: ubuntu-latest

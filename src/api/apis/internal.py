@@ -8,7 +8,7 @@ from services import STORAGE
 from models import Scenario, User
 
 internal = func.Blueprint()
-COMPETITON_PHASE = os.getenv("COMPETITON_PHASE")
+COMPETITION_PHASE = os.getenv("COMPETITION_PHASE")
 
 
 @internal.route("api/internal/healthcheck", methods=["GET"])
