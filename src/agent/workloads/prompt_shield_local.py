@@ -12,7 +12,15 @@ class JailbreakModelOnnx:
         self.tokenizer = DebertaV2Tokenizer.from_pretrained(os.path.join(model_root, "model"))
 
         self.device = (
-            torch.device("cuda:0" if torch.cuda.is_available() else "cpu") if device is None else device
+            torch.device(
+                "cuda:0"
+                if torch.cuda.is_available()
+                else "mps"
+                if torch.backends.mps.is_available()
+                else "cpu"
+            )
+            if device is None
+            else device
         )
 
         providers = [

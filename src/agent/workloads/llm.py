@@ -6,9 +6,7 @@ import torch
 import logging
 import numpy as np
 from openai import AzureOpenAI
-from transformers import AutoTokenizer, pipeline, AutoModelForCausalLM, AutoConfig
-from azure.ai.inference import ChatCompletionsClient
-from azure.core.credentials import AzureKeyCredential
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, pipeline
 
 from .models import LLMResponse, ToolCall
 from .detection import Detection_Defense
@@ -265,10 +263,17 @@ class Phi3LLM(LLM):
 
     def __init__(self, llm_name, config: dict):
         super().__init__(llm_name, config)
-        self.open_source_client = ChatCompletionsClient(
-            endpoint=os.getenv("AZURE_OPEN_SOURCE_ENDPOINT"),
-            credential=AzureKeyCredential(os.getenv("AZURE_OPEN_SOURCE_API_KEY")),
-            seed=100,
+        model = AutoModelForCausalLM.from_pretrained(
+            self.llm_name,
+            device_map="mps",
+            torch_dtype="auto",
+            trust_remote_code=True,
+        )
+        tokenizer = AutoTokenizer.from_pretrained(self.llm_name)
+        self.open_source_client = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
         )
         self.llm_system_prompt_tool = config["llm_system_prompt_tool"]
         assert len(config["llm_tools"]) <= 1, "Phi3 only supports one tool."
@@ -282,8 +287,8 @@ class Phi3LLM(LLM):
         full_prompt = system_prompt + "\n" + query + "\n\n" + emails
         messages = [{"role": "user", "content": full_prompt}]
 
-        payload = {"messages": messages, "max_tokens": self.max_new_tokens, "top_p": self.top_p}
-        response = self.open_source_client.complete(payload, seed=100)
+        options = {"seed": 100, "max_tokens": self.max_new_tokens, "top_p": self.top_p}
+        response = self.open_source_client(messages, **options)
 
         if not response.choices:
             logging.error("No response from the LLM.")

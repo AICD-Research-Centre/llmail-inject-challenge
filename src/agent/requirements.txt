@@ -1,7 +1,6 @@
 openai
 azure-identity
 azure-storage-queue
-azure-monitor-opentelemetry
 PyYAML
 accelerate
 azure-ai-inference
@@ -10,7 +9,7 @@ transformers
 pytest
 pytest-mock
 sentence_transformers
-onnxruntime-gpu
+# onnxruntime-gpu
 tiktoken
 docopt
 python-dotenv

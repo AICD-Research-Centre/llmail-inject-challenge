@@ -34,7 +34,7 @@ top_p: 0.92
 max_new_tokens: 500
 llm_dry_run: False
 llms:
-  - gpt-4o-mini-no-filter
+#  - gpt-4o-mini-no-filter
   - microsoft/Phi-3-medium-128k-instruct
 defense:
   # NOTE: TaskTracker must be enabled explicitly when running the agent.
@@ -45,7 +45,7 @@ defense:
   - task_tracker_phi3.5_moe
   - task_tracker_phi4
   - prompt_shield
-  - llm_judge
+#  - llm_judge
   - spotlight
   - all
 

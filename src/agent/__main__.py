@@ -1,28 +1,18 @@
 import argparse
 import asyncio
-import json
 import sys
 from os.path import dirname
 
 sys.path.insert(0, dirname(dirname(__file__)))
 
-from utils.better_logging import logger
-from agent.job_sources.azure_queue import AzureQueueJobSource
 from agent.job_sources.local import LocalJobSource
-from agent.job_sources.stress_test import StressTestJobSource
 from agent.runner import JobRunner
-from agent.telemetry import tracer, SpanKind
 from agent.workload import Workload
 import os
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run the challenge agent in local or azure mode.")
-    parser.add_argument(
-        "source",
-        choices=["local", "azure", "stress"],
-        help="Mode to run the agent. 'local' for local job processing, 'azure' for Azure Queue processing.",
-    )
+    parser = argparse.ArgumentParser(description="Run the challenge agent")
     parser.add_argument(
         "--enable-task-tracker",
         action="store_true",
@@ -38,24 +28,15 @@ def parse_args():
     parser.add_argument(
         "--phase",
         choices=["phase1", "phase2"],
-        required=True,
+        required=False,
+        default="phase1",
         help="Competition phase to control which defenses to use.",
     )
     return parser.parse_known_args()
 
 
-async def main(source: str, enable_task_tracker: bool, no_op_workload: bool, unknown_args: list[str]):
-    sources = {
-        "local": LocalJobSource,
-        "azure": AzureQueueJobSource,
-        "stress": StressTestJobSource,
-    }
-
-    if source not in sources:
-        logger.error(f"Unknown source: {source}")
-        return
-
-    job_source = sources[source](unknown_args)
+async def main(enable_task_tracker: bool, no_op_workload: bool, unknown_args: list[str]):
+    job_source = LocalJobSource(unknown_args)
 
     workload: Workload | None = None
     if no_op_workload:
@@ -74,16 +55,14 @@ async def main(source: str, enable_task_tracker: bool, no_op_workload: bool, unk
 
 if __name__ == "__main__":
     """
-    Run the agent in local or azure mode.
+    Run the agent in local mode.
 
     For task-tracker agents, we will generally need to configure the dispatch queue name:
 
-    > export STORAGE_ACCOUNT_NAME="llmail-example"
-    > export DISPATCH_QUEUE_NAME="dispatch-task-tracker"
-    > python ./src/agent azure --enable-task-tracker
+    > python ./src/agent --enable-task-tracker --phase phase1
     """
     args, unknown_args = parse_args()
     os.environ["COMPETITION_PHASE"] = args.phase
 
     # Run the agent
-    asyncio.run(main(args.source, args.enable_task_tracker, args.no_op_workload, unknown_args))
+    asyncio.run(main(args.enable_task_tracker, args.no_op_workload, unknown_args))
