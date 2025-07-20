@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from api.models import JobMessage, JobResult
-from utils.better_logging import logger
 
 
 # Base Agent class

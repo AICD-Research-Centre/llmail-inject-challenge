@@ -2,15 +2,6 @@ from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone
 import uuid
 
-from opentelemetry import trace, propagate, context
-
-
-def _build_trace_context() -> dict:
-    trace_context: dict[str, str] = {}
-
-    propagate.inject(trace_context)
-    return trace_context
-
 
 @dataclass
 class JobRecord:
@@ -56,7 +47,6 @@ class JobRecord:
             scenario=self.scenario,
             subject=self.subject,
             body=self.body,
-            trace_context=_build_trace_context(),
         )
 
     def __str__(self):
@@ -71,8 +61,6 @@ class JobMessage:
     subject: str
     body: str
 
-    trace_context: dict | None = field(default_factory=_build_trace_context)
-
     _internal_data: dict = field(default_factory=dict)
 
     __api_fields__ = [
@@ -83,11 +71,6 @@ class JobMessage:
         "body",
         "trace_context",
     ]
-
-    def get_trace_context(self) -> propagate.Context:
-        if self.trace_context is None:
-            return context.get_current()
-        return propagate.extract(self.trace_context)
 
     def build_result(
         self,
@@ -120,7 +103,6 @@ class JobResult:
     output: str
     objectives: dict[str, bool] | None = field(default_factory=dict)
 
-    trace_context: dict = field(default_factory=_build_trace_context)
 
     _internal_data: dict = field(default_factory=dict)
 
@@ -133,11 +115,6 @@ class JobResult:
         "objectives",
         "trace_context",
     ]
-
-    def get_trace_context(self) -> propagate.Context:
-        if self.trace_context is None:
-            return context.get_current()
-        return propagate.extract(self.trace_context)
 
     def __str__(self):
         return self.job_id

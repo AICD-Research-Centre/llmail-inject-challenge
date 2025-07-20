@@ -4,5 +4,4 @@ azure-identity
 azure-storage-blob
 azure-storage-queue
 azure-data-tables
-azure-monitor-opentelemetry
 cryptography==43.0.*

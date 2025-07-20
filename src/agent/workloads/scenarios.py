@@ -237,7 +237,7 @@ class GeneralWorkload(Workload):
         ]
 
         defenses = config["defense"]
-        print(f"DEFENSES {defenses}")
+
         if not self.task_tracker and (check_task_tracker_in_defs(defenses) or "prompt_shield" in defenses):
             logger.warning(
                 "Task tracker defense is not enabled. Removing it and prompt_shield from the list of supported defenses as they need GPUs."

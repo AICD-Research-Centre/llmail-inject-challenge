@@ -1,5 +1,4 @@
 -r src/agent/requirements.txt
--r src/api/requirements.txt
 pytest
 pytest-cov
 pytest-mock

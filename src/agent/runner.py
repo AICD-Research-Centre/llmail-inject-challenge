@@ -3,7 +3,6 @@ from utils.better_logging import logger
 
 from agent.workload import Workload
 from agent.job_source import JobSource
-from api.models import to_telemetry_attributes
 
 
 class JobRunner:

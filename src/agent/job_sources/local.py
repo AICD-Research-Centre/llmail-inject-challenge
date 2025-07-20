@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from agent import JobSource, Workload
+from agent import JobSource
 from api.models import JobMessage, JobResult
 from utils.better_logging import logger
 

@@ -265,7 +265,11 @@ class Phi3LLM(LLM):
         super().__init__(llm_name, config)
         model = AutoModelForCausalLM.from_pretrained(
             self.llm_name,
-            device_map="mps",
+            device_map= "cuda"
+                if torch.cuda.is_available()
+                else "mps"
+                if torch.backends.mps.is_available()
+                else "cpu",
             torch_dtype="auto",
             trust_remote_code=True,
         )
